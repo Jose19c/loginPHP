@@ -34,9 +34,9 @@ while ($row = $resAlumnos->fetch_assoc()) {
     <title>Panel del Maestro</title>
     <link rel="stylesheet" href="assets/css/maestro.css">
     <link rel="icon" href="assets/img/maestro.png" type="maestro.png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <div class="container">
         <h2>Bienvenido, <?php echo htmlspecialchars($nombreMaestro); ?></h2>
         <h4>Lista de Alumnos</h4>
@@ -83,8 +83,7 @@ while ($row = $resAlumnos->fetch_assoc()) {
         </table>
 
         <button onclick="toggleLista()" id="toggleButton">Mostrar lista</button>
-        <button onclick="descargarPDF()" class="btn azul" style="margin-left:10px; display:none;" id="downloadPDFButton">Descargar PDF</button>
-        
+        <button onclick="descargarExcel()" class="btn azul" style="margin-left:10px; display:none;" id="downloadExcelButton">Descargar Excel</button>
 
         <div id="listaContainer">
             <h3>Lista</h3>
@@ -112,7 +111,6 @@ while ($row = $resAlumnos->fetch_assoc()) {
                             $estadosPorFecha[$fecha] = $f['asistencia'] ?? '-';
                         }
 
-                        // Nuevo cálculo de asistencias considerando penalización por retardos
                         $queryAsistencias = "SELECT asistencia FROM asistencias WHERE id_usuario = $idAlumno AND (asistencia = 'Asistencia' OR asistencia = 'Retardo')";
                         $resAsistencias = $conexion->query($queryAsistencias);
 
@@ -123,7 +121,7 @@ while ($row = $resAlumnos->fetch_assoc()) {
                             if ($row['asistencia'] === 'Asistencia') {
                                 $asistencias++;
                             } elseif ($row['asistencia'] === 'Retardo') {
-                                $asistencias++; // se cuenta como asistencia
+                                $asistencias++;
                                 $retardos++;
                             }
                         }
@@ -155,49 +153,26 @@ while ($row = $resAlumnos->fetch_assoc()) {
         function toggleLista() {
             const container = document.getElementById('listaContainer');
             const button = document.getElementById('toggleButton');
-            const downloadButton = document.getElementById('downloadPDFButton');
+            const downloadButton = document.getElementById('downloadExcelButton');
 
             if (!container.classList.contains('visible')) {
                 container.classList.add('visible');
                 button.textContent = 'Ocultar lista';
-                downloadButton.style.display = 'inline-block'; // Mostrar botón de descarga
+                downloadButton.style.display = 'inline-block';
             } else {
                 container.classList.remove('visible');
                 button.textContent = 'Mostrar lista';
-                downloadButton.style.display = 'none'; // Ocultar botón de descarga
+                downloadButton.style.display = 'none';
             }
         }
-        function descargarPDF() {
-    const container = document.getElementById('listaContainer');
-    let wasHidden = false;
 
-    // Fuerza modo claro
-    document.body.classList.add('force-light');
-
-    if (!container.classList.contains('visible')) {
-        container.classList.add('visible');
-        wasHidden = true;
-    }
-
-    window.getComputedStyle(container).visibility;
-
-    setTimeout(() => {
-        const opt = {
-            margin:       0.5,
-            filename:     'lista_asistencias.pdf',
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2 },
-            jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
-        };
-        html2pdf().set(opt).from(container).save().then(() => {
-            // Quita modo claro forzado
-            document.body.classList.remove('force-light');
-            if (wasHidden) {
-                container.classList.remove('visible');
-            }
-        });
-    }, 500);
-}
+        function descargarExcel() {
+            const tabla = document.querySelector('#listaContainer table');
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.table_to_sheet(tabla);
+            XLSX.utils.book_append_sheet(wb, ws, 'Lista de Asistencia');
+            XLSX.writeFile(wb, 'lista_asistencias.xlsx');
+        }
     </script>
 </body>
 </html>
