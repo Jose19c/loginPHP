@@ -145,30 +145,32 @@ h2 {
 /* ====== ESTILOS Y ANIMACIÓN DE #listaContainer ====== */
 #listaContainer {
   width: 100%;
-  max-height: 0;
-  overflow: hidden;
-  opacity: 0;
-  transition: max-height 0.6s ease, opacity 0.6s ease;
+  visibility: hidden;
+  height: 0;
   margin-top: 30px;
-  padding: 20px;
+  padding: 0;
   background-color: #ffffff;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.1);
   color: var(--texto-claro);
+  overflow: visible;
+  transition: none;
 }
 
 #listaContainer.visible {
-  max-height: 2000px;
-  opacity: 1;
+  visibility: visible;
+  height: auto;
+  padding: 20px;
 }
 
 #listaContainer table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
+  /* table-layout: fixed; */ /* <-- Elimina o comenta esta línea */
   word-wrap: break-word;
   margin-top: 15px;
   background-color: transparent;
+  overflow: visible; /* <-- Asegura que todo el contenido sea visible */
 }
 
 #listaContainer th,
@@ -241,4 +243,22 @@ h2 {
   #toggleButton:hover {
     background: linear-gradient(135deg, #341f97, #00b894);
   }
+}
+
+/* Fuerza modo claro para PDF */
+body.force-light,
+body.force-light #listaContainer,
+body.force-light #listaContainer th,
+body.force-light #listaContainer td {
+  background: #fff !important;
+  background-color: #fff !important;
+  color: #333 !important;
+  border-color: #ccc !important;
+}
+body.force-light #listaContainer th {
+  background: var(--color-primario) !important;
+  color: #fff !important;
+}
+body.force-light #listaContainer td {
+  background: #f9f9f9 !important;
 }
