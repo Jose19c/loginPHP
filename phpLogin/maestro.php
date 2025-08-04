@@ -1,4 +1,4 @@
-<?php
+<?php 
 include("conexion.php");
 session_start();
 
@@ -33,7 +33,11 @@ while ($row = $resAlumnos->fetch_assoc()) {
     <meta charset="UTF-8">
     <title>Panel del Maestro</title>
     <link rel="stylesheet" href="assets/css/maestro.css">
-    <link rel="icon" href="assets/img/maestro.png" type="maestro.png">
+    <link rel="icon" href="assets/img/maestro.png" type="image/png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
@@ -84,6 +88,7 @@ while ($row = $resAlumnos->fetch_assoc()) {
 
         <button onclick="toggleLista()" id="toggleButton">Mostrar lista</button>
         <button onclick="descargarExcel()" class="btn azul" style="margin-left:10px; display:none;" id="downloadExcelButton">Descargar Excel</button>
+        <button onclick="descargarPDF()" class="btn rojo" style="margin-left:10px; display:none;" id="downloadPDFButton">Descargar PDF</button>
 
         <div id="listaContainer">
             <h3>Lista</h3>
@@ -150,29 +155,145 @@ while ($row = $resAlumnos->fetch_assoc()) {
     </div>
 
     <script>
-        function toggleLista() {
-            const container = document.getElementById('listaContainer');
-            const button = document.getElementById('toggleButton');
-            const downloadButton = document.getElementById('downloadExcelButton');
+    function toggleLista() {
+        const container = document.getElementById('listaContainer');
+        const button = document.getElementById('toggleButton');
+        const downloadExcelButton = document.getElementById('downloadExcelButton');
+        const downloadPDFButton = document.getElementById('downloadPDFButton');
 
-            if (!container.classList.contains('visible')) {
-                container.classList.add('visible');
-                button.textContent = 'Ocultar lista';
-                downloadButton.style.display = 'inline-block';
-            } else {
-                container.classList.remove('visible');
-                button.textContent = 'Mostrar lista';
-                downloadButton.style.display = 'none';
+        if (!container.classList.contains('visible')) {
+            container.classList.add('visible');
+            button.textContent = 'Ocultar lista';
+            downloadExcelButton.style.display = 'inline-block';
+            downloadPDFButton.style.display = 'inline-block';
+        } else {
+            container.classList.remove('visible');
+            button.textContent = 'Mostrar lista';
+            downloadExcelButton.style.display = 'none';
+            downloadPDFButton.style.display = 'none';
+        }
+    }
+
+    function obtenerFechaFormatoEspañol() {
+        const fecha = new Date();
+        const dia = String(fecha.getDate()).padStart(2, '0');
+        const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+        const anio = fecha.getFullYear();
+        return `${dia}/${mes}/${anio}`;
+    }
+
+    function generarNombreArchivo() {
+        const nombreMaestro = "<?php echo addslashes($nombreMaestro); ?>";
+        const fecha = obtenerFechaFormatoEspañol().replace(/\//g, '-');
+        return `Lista de asistencias de ${nombreMaestro} - ${fecha}`;
+    }
+
+    function descargarExcel() {
+        const tabla = document.querySelector('#listaContainer table');
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.table_to_sheet(tabla, { cellStyles: true });
+
+        const colWidths = [];
+        const rows = tabla.rows;
+        for (let c = 0; c < rows[0].cells.length; c++) {
+            let maxLength = 10;
+            for (let r = 0; r < rows.length; r++) {
+                const cellText = rows[r].cells[c]?.innerText || '';
+                if (cellText.length > maxLength) maxLength = cellText.length;
             }
+            colWidths.push({ wch: maxLength + 2 });
+        }
+        ws['!cols'] = colWidths;
+
+        // Estilos de borde y centrado
+        Object.keys(ws).forEach(key => {
+            if (key[0] !== '!') {
+                ws[key].s = {
+                    alignment: { horizontal: "center", vertical: "center", wrapText: true },
+                    border: {
+                        top: { style: "thin", color: { auto: 1 } },
+                        bottom: { style: "thin", color: { auto: 1 } },
+                        left: { style: "thin", color: { auto: 1 } },
+                        right: { style: "thin", color: { auto: 1 } }
+                    }
+                };
+            }
+        });
+
+        XLSX.utils.book_append_sheet(wb, ws, 'Lista de Asistencia');
+        XLSX.writeFile(wb, generarNombreArchivo() + '.xlsx');
+    }
+
+    async function descargarPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('landscape');
+
+        // Cargar imagen y continuar cuando esté lista
+        const imgUrl = "https://tusitio.com/logo.png"; // Cambia por tu imagen
+        const image = await cargarImagen(imgUrl);
+
+        if (image) {
+            const imgWidth = 60;
+            const imgHeight = 30;
+            const pageWidth = doc.internal.pageSize.getWidth();
+            doc.addImage(image, 'PNG', pageWidth - imgWidth - 20, 10, imgWidth, imgHeight);
         }
 
-        function descargarExcel() {
-            const tabla = document.querySelector('#listaContainer table');
-            const wb = XLSX.utils.book_new();
-            const ws = XLSX.utils.table_to_sheet(tabla);
-            XLSX.utils.book_append_sheet(wb, ws, 'Lista de Asistencia');
-            XLSX.writeFile(wb, 'lista_asistencias.xlsx');
-        }
-    </script>
+        doc.setFontSize(12);
+        doc.text("Lista de Asistencias", 14, 20);
+        doc.text("Maestro: <?php echo addslashes($nombreMaestro); ?>", 14, 30);
+        doc.text("Fecha: " + obtenerFechaFormatoEspañol(), 14, 40);
+
+        const tabla = document.querySelector('#listaContainer table');
+        const headers = [];
+        const body = [];
+
+        const ths = tabla.querySelectorAll('thead tr th');
+        ths.forEach(th => headers.push(th.innerText));
+
+        const filas = tabla.querySelectorAll('tbody tr');
+        filas.forEach(tr => {
+            const rowData = [];
+            tr.querySelectorAll('td').forEach(td => rowData.push(td.innerText));
+            body.push(rowData);
+        });
+
+        doc.autoTable({
+            head: [headers],
+            body: body,
+            startY: 50,
+            theme: 'grid',
+            styles: {
+                halign: 'center',
+                valign: 'middle',
+                fontSize: 8,
+                cellPadding: 2
+            },
+            headStyles: {
+                fillColor: [41, 128, 185],
+                textColor: 255
+            }
+        });
+
+        doc.save(generarNombreArchivo() + '.pdf');
+    }
+
+    // Carga imagen de una URL y la convierte en base64
+    function cargarImagen() {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = function () {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            canvas.getContext('2d').drawImage(img, 1, 1);
+            resolve(canvas.toDataURL('image/png'));
+        };
+        img.onerror = reject;
+        img.src = "assets/img/ites.png";
+    });
+}
+</script>
 </body>
 </html>
