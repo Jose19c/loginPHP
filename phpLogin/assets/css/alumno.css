@@ -195,3 +195,48 @@ tbody tr:hover {
     border-radius: 12px;
     background-color: #121b2c;
 }
+/* Temporizador flotante */
+#timer-box {
+    position: absolute;
+    top: 100px;
+    right: 20px; /* Cambiado de 'left' a 'right' */
+    background-color: #ffffff;
+    color: #0d47a1;
+    border: 2px solid #1976d2;
+    border-radius: 12px;
+    padding: 10px 8px;
+    cursor: move;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    z-index: 10;
+    user-select: none;
+    min-width: 180px;
+    text-align: center;
+}
+
+#timer-title {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+#timer {
+    font-size: 26px;
+    font-weight: bold;
+    color: #e53935; /* Rojo vivo para urgencia */
+}
+
+/* Temporizador en modo oscuro */
+@media (prefers-color-scheme: dark) {
+    #timer-box {
+        background-color: #1f2a48;
+        color: #a9c8ff;
+        border: 2px solid #3a5ca8;
+        box-shadow: 0 6px 20px rgba(13, 40, 93, 0.6);
+        right: 20px; /* Asegura que también se mantenga a la derecha en modo oscuro */
+    }
+
+    #timer {
+        color: #ff8a80; /* Rojo claro en oscuro */
+    }
+}
