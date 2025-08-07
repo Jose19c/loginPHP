@@ -83,7 +83,7 @@ if (isset($_POST["registrar"])) {
     <link rel="stylesheet" href="assets/css/estilos.css"/>
     <link rel="icon" href="assets/img/logo.png" type="logo.png">
 </head>
-
+<body class="login-layout" class="img-bg" style="background: url('assets/img/login.jpeg') no-repeat center center fixed; background-size: cover;">
 <body class="login-layout">
     <div class="main-container">
         <div class="main-content">
