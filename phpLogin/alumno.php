@@ -55,22 +55,37 @@ if ($resRetardos) {
     <meta charset="UTF-8">
     <title>Asistencias y Participaciones</title>
     <link rel="stylesheet" href="assets/css/alumno.css"/>
-    <link rel="icon" href="assets/img/alumno.png" type="image/png">
+    <link rel="icon" href="assets/img/alumno.png" type="alumno.png">
+
+    <script>
+    window.onload = function() {
+        let faltas = <?php echo $cantidadFaltas; ?>;
+        let retardos = <?php echo $cantidadRetardos; ?>;
+
+        // Alerta si tiene 2 retardos
+        if (retardos === 2) {
+            alert("⚠️ Un retardo más y se convierte en una falta.");
+        }
+
+        // Convertir 3 retardos en 1 falta
+        let totalFaltas = faltas + Math.floor(retardos / 3);
+
+        if (totalFaltas === 2) {
+            alert("⚠️ Solo puedes faltar una vez más.");
+        } else if (totalFaltas >= 3) {
+            alert("❌ Ya no puedes volver a faltar.");
+        }
+    }
+    </script>
 </head>
-<body>
+<body class="img-bg" style="background: url('assets/img/alu_fondo.png') no-repeat center center fixed; background-size: cover;">
     <div class="container mt-5">
         <div class="bienvenida-alumno">
-            <div class="contenedor-horario">
-                <img src="assets/img/Horario.jpeg" alt="Horario" class="img-horario">
-            </div>
-            <!-- Temporizador -->
-            <div id="timer-box">
-                <div id="timer-title">🕒 Tiempo para llegar a clase</div>
-                <div id="timer">15:00</div>
-            </div>
-            <h3>Bienvenido, <?php echo htmlspecialchars($nombre); ?></h3>
-        </div>
-
+    <div class="contenedor-horario">
+        <img src="assets/img/Horario.jpeg" alt="Horario" class="img-horario">
+    </div>
+    <h3>Bienvenido, <?php echo htmlspecialchars($nombre); ?></h3>
+</div>
         <h4>Historial de Asistencias y Participaciones</h4>
         <table class="table table-bordered table-striped mt-3">
             <thead class="thead-dark">
@@ -119,7 +134,7 @@ if ($resRetardos) {
     const horarios = {
         1: "08:00", // Lunes
         2: "21:50", // Martes
-        3: "07:00", // Miércoles
+        3: "10:00", // Miércoles
         4: "07:00", // Jueves
         5: "07:00"  // Viernes
     };
