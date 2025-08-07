@@ -135,8 +135,10 @@ while ($row = $resAlumnos->fetch_assoc()) {
                         $totalAsistencias = $asistencias - $penalizacion;
                         if ($totalAsistencias < 0) $totalAsistencias = 0;
 
-                        $queryParticipaciones = "SELECT COUNT(*) AS total FROM asistencias WHERE id_usuario = $idAlumno AND participacion = 'Si'";
-                        $totalParticipaciones = $conexion->query($queryParticipaciones)->fetch_assoc()['total'];
+                        $queryParticipaciones = "SELECT SUM(participacion) AS total FROM asistencias WHERE id_usuario = $idAlumno";
+                        $resParticipaciones = $conexion->query($queryParticipaciones);
+                        $participacionesData = $resParticipaciones->fetch_assoc();
+                        $totalParticipaciones = $participacionesData['total'] ?? 0;
                     ?>
                     <tr>
                         <td><?php echo htmlspecialchars($nombreAlumno); ?></td>
