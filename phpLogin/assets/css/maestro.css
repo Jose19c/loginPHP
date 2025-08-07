@@ -18,12 +18,8 @@
 }
 
 /* ====== BODY BÁSICO ====== */
-body {
-  background: var(--fondo-claro);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: var(--texto-claro);
-  line-height: 1.6;
-  animation: fadeIn 1s ease-in-out;
+body{
+    backdrop-filter: blur(7px);
 }
 
 @keyframes fadeIn {
