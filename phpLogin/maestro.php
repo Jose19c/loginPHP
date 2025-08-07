@@ -41,6 +41,7 @@ while ($row = $resAlumnos->fetch_assoc()) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
+    <body class="img-bg" style="background: url('assets/img/mae_fondo.jpg') no-repeat center center fixed; background-size: cover;">
     <div class="container">
         <h2>Bienvenido, <?php echo htmlspecialchars($nombreMaestro); ?></h2>
         <h4>Lista de Alumnos</h4>
