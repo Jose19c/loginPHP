@@ -87,7 +87,8 @@ if ($resRetardos) {
     <h3>Bienvenido, <?php echo htmlspecialchars($nombre); ?></h3>
 </div>
         <h4>Historial de Asistencias y Participaciones</h4>
-        <table class="table table-bordered table-striped mt-3">
+        <div class="table-responsive">
+            <table class="table">
             <thead class="thead-dark">
                 <tr>
                     <th>Fecha</th>
@@ -105,7 +106,7 @@ if ($resRetardos) {
                 <?php endwhile; ?>
             </tbody>
         </table>
-
+    </div>
         <a href="salir.php" class="btn btn-danger">Cerrar sesión</a>
     </div>
 
@@ -258,3 +259,4 @@ const timerBox = document.getElementById('timer-box');
     </script>
 </body>
 </html>
+
